@@ -455,7 +455,15 @@ function loadWordBankUI() {
     checkWordBankCompletion();
 }
 
-// toggleWord() stays exactly the same! You don't need to touch it.
+function toggleWord(word, element) {
+    foundWords[word] = !foundWords[word];
+    element.classList.toggle("found");
+
+    localStorage.setItem("wordBankFound_Sedona", JSON.stringify(foundWords));
+    
+    // Check if they just found the last word
+    checkWordBankCompletion();
+}
 
 function checkWordBankCompletion() {
     const btn = document.getElementById("wordbank-btn");
