@@ -207,6 +207,18 @@
             font-weight: bold;
         }
 
+		/* Scavenger Hunt Type Indicators */
+.word-item.image {
+    border-left: 4px solid var(--highlight); /* Orange line for images */
+}
+.word-item.word {
+    border-left: 4px solid var(--primary); /* Green line for text */
+}
+.word-item span {
+    margin-right: 5px;
+    font-size: 1.1rem;
+}
+
         /* ========================================================= */
         /* ====================== WORD BANK UI ====================== */
         /* ========================================================= */
@@ -383,26 +395,26 @@
     let players = [];
     const totalHoles = 18;
 
-    /* ======================== WORD BANK DATA ======================== */
-    let wordList = [
-        "Ruby",
-        "Cathedral Rock",
-        "Che",
-        "Amitabha Stupa",
-        "The Chapel",
-        "Dane",
-        "Snoopy Rock",
-        "Armando",
-        "Chimney Rock",
-        "Long Neck",
-        "Big Foot",
-        "Eagle Dancer",
-		"Thunder Mountain",
-		"Devil's Bridge",
-		"Carla",
-		"Petroglyphs",
-		"Sacred Pools",
-    ];
+/* ======================== WORD BANK DATA ======================== */
+let wordList = [
+    { id: "Ruby", type: "word" },
+    { id: "Cathedral Rock", type: "word" },
+    { id: "Che", type: "word" },
+    { id: "Amitabha Stupa", type: "word" },
+    { id: "The Chapel", type: "word" },
+    { id: "Dane", type: "word" },
+    { id: "Snoopy Rock", type: "word" },
+    { id: "Armando", type: "word" },
+    { id: "Chimney Rock", type: "word" },
+    { id: "Long Neck", type: "word" },
+    { id: "Big Foot", type: "word" },
+    { id: "Eagle Dancer", type: "word" },
+    { id: "Thunder Mountain", type: "word" },
+    { id: "Devil's Bridge", type: "word" },
+    { id: "Carla", type: "image" },
+    { id: "Petroglyphs", type: "image" },
+    { id: "Sacred Pools", type: "image" }
+];
 
     let foundWords = JSON.parse(localStorage.getItem("wordBankFound_Sedona")) || {};
 
@@ -419,52 +431,48 @@
         }
     };
 
-    /* ====================== WORD BANK UI BUILD ====================== */
-    function loadWordBankUI() {
-        const listDiv = document.getElementById("word-list");
-        listDiv.innerHTML = "";
+ /* ====================== WORD BANK UI BUILD ====================== */
+function loadWordBankUI() {
+    const listDiv = document.getElementById("word-list");
+    listDiv.innerHTML = "";
 
-        wordList.forEach(word => {
-            const div = document.createElement("div");
-            div.className = "word-item";
-            if (foundWords[word]) div.classList.add("found");
-            div.innerText = word;
-
-            div.onclick = () => toggleWord(word, div);
-            listDiv.appendChild(div);
-        });
+    wordList.forEach(item => {
+        const div = document.createElement("div");
         
-        // Check if they already won when the page loads
-        checkWordBankCompletion();
-    }
-
-    function toggleWord(word, element) {
-        foundWords[word] = !foundWords[word];
-        element.classList.toggle("found");
-
-        localStorage.setItem("wordBankFound_Sedona", JSON.stringify(foundWords));
+        // Injects the class "image" or "word" for the CSS borders
+        div.className = `word-item ${item.type}`; 
         
-        // Check if they just found the last word
-        checkWordBankCompletion();
-    }
+        if (foundWords[item.id]) div.classList.add("found");
 
-    function checkWordBankCompletion() {
-        const btn = document.getElementById("wordbank-btn");
-        
-        // This checks if EVERY word in the list exists and is true in foundWords
-        const allFound = wordList.every(w => foundWords[w]);
+        // Picks the emoji based on the type
+        const icon = item.type === "image" ? "📸" : "📝";
+        div.innerHTML = `<span>${icon}</span> ${item.id}`;
 
-        if (allFound) {
-            btn.style.backgroundColor = "#FFEB3B"; // Gold color
-            btn.style.color = "#000000";           // Black text
-            btn.innerText = "🏆 All Found! 🏆";
-        } else {
-            // Resets it back to normal if they un-check a word
-            btn.style.backgroundColor = "var(--primary)";
-            btn.style.color = "white";
-            btn.innerText = "Word Bank";
-        }
+        div.onclick = () => toggleWord(item.id, div);
+        listDiv.appendChild(div);
+    });
+    
+    checkWordBankCompletion();
+}
+
+// toggleWord() stays exactly the same! You don't need to touch it.
+
+function checkWordBankCompletion() {
+    const btn = document.getElementById("wordbank-btn");
+    
+    // Updated to look at item.id instead of just the word string
+    const allFound = wordList.every(item => foundWords[item.id]);
+
+    if (allFound) {
+        btn.style.backgroundColor = "#FFEB3B"; 
+        btn.style.color = "#000000";            
+        btn.innerText = "🏆 All Found! 🏆";
+    } else {
+        btn.style.backgroundColor = "var(--primary)";
+        btn.style.color = "white";
+        btn.innerText = "Word Bank";
     }
+}
 
     function toggleWordBank() {
         document.getElementById("wordbank-panel").classList.toggle("open");
